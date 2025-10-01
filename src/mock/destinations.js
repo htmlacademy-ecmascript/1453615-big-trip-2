@@ -61,4 +61,4 @@ const mockDestinations = [
   }
 ];
 
-export {mockDestinations};
+export {mockDestinations}

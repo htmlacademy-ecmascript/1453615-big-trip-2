@@ -8,11 +8,14 @@ import TripPointView from '../view/trip-point-view';
 export default class TripPresenter {
   eventsListComponent = new EventsListView();
 
-  constructor({tripContainer}) {
+  constructor({tripContainer, pointsModel}) {
     this.tripContainer = tripContainer;
+    this.pointsModel = pointsModel;
   }
 
   init() {
+    this.tripPoints = [...this.pointsModel.getPoints()];
+
     render(new SortingView(), this.tripContainer);
     render(this.eventsListComponent, this.tripContainer);
     const listItemEditComponent = new EventListItemView();
@@ -20,7 +23,7 @@ export default class TripPresenter {
     render(listItemEditComponent, this.eventsListComponent.getElement());
     for (let i = 0; i < 3; i++) {
       const listItemComponent = new EventListItemView();
-      render(new TripPointView(), listItemComponent.getElement());
+      render(new TripPointView(tripPoints[i]), listItemComponent.getElement());
       render(listItemComponent, this.eventsListComponent.getElement());
     }
   }
