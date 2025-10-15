@@ -1,5 +1,5 @@
 import {createElement} from '../render.js';
-import {dateFormatters} from '../utils.js';
+import {dateFormatters, formatTimeDuration} from '../utils.js';
 
 function createTripPointTemplate(point, offers, destinations) {
   const { basePrice, dateFrom, dateTo, isFavorite, type } = point;
@@ -7,17 +7,21 @@ function createTripPointTemplate(point, offers, destinations) {
   const typeOffers = offers.find((offerItem) => offerItem.type === point.type).offers;
   const pointOffers = typeOffers.filter((typeOffer) => point.offers.includes(typeOffer.id));
 
-  const createOfferTemplate = (offer) => {
-    return (
-      `<li class="event__offer">
-        <span class="event__offer-title">${offer.title}</span>
-        &plus;&euro;&nbsp;
-        <span class="event__offer-price">${offer.price}</span>
-      </li>`
-    )
-  };
-
-  const createOffersListTemplate = (offers) => offers.map(createOfferTemplate).join('');
+  function createOffersListTemplate(availableOffers) {
+    if (availableOffers?.length > 0) {
+      return (
+        `<ul class="event__selected-offers">
+          ${availableOffers.map((offerItem) => (`<li class="event__offer">
+              <span class="event__offer-title">${offerItem.title}</span>
+              &plus;&euro;&nbsp;
+              <span class="event__offer-price">${offerItem.price}</span>
+            </li>`)).join('')}
+        </ul>`
+      );
+    } else {
+      return '';
+    }
+  }
 
   return (
     `<li class="trip-events__item">
@@ -48,15 +52,13 @@ function createTripPointTemplate(point, offers, destinations) {
                 ${dateFormatters.toTime(dateTo)}
               </time>
             </p>
-            <p class="event__duration">30M</p>
+            <p class="event__duration">${formatTimeDuration(dateFrom, dateTo)}</p>
           </div>
           <p class="event__price">
             &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
           </p>
           <h4 class="visually-hidden">Offers:</h4>
-          <ul class="event__selected-offers">
-            ${createOffersListTemplate(pointOffers)}
-          </ul>
+          ${createOffersListTemplate(pointOffers)}
           <button
             class="event__favorite-btn
             ${isFavorite ? 'event__favorite-btn--active' : ''}"
