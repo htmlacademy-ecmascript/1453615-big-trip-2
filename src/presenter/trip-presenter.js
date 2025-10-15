@@ -1,27 +1,28 @@
 import { render } from '../render';
 import EventsListView from '../view/events-list-view';
-import EventListItemView from '../view/event-list-item-view';
 import SortingView from '../view/sorting-view';
-import PointAddView from '../view/point-add-view';
+import PointEditView from '../view/point-edit-view';
 import TripPointView from '../view/trip-point-view';
 
 export default class TripPresenter {
   eventsListComponent = new EventsListView();
 
-  constructor({tripContainer}) {
+  constructor({tripContainer, pointsModel}) {
     this.tripContainer = tripContainer;
+    this.pointsModel = pointsModel;
   }
 
   init() {
+    const tripPoints = [...this.pointsModel.getPoints()];
+    const offers = this.pointsModel.getOffers();
+    const destinations = this.pointsModel.getDestinations();
+
     render(new SortingView(), this.tripContainer);
     render(this.eventsListComponent, this.tripContainer);
-    const listItemEditComponent = new EventListItemView();
-    render(new PointAddView(), listItemEditComponent.getElement());
-    render(listItemEditComponent, this.eventsListComponent.getElement());
-    for (let i = 0; i < 3; i++) {
-      const listItemComponent = new EventListItemView();
-      render(new TripPointView(), listItemComponent.getElement());
-      render(listItemComponent, this.eventsListComponent.getElement());
+    render(new PointEditView(tripPoints[0], offers, destinations), this.eventsListComponent.getElement());
+
+    for (let i = 1; i <= 3; i++) {
+      render(new TripPointView(tripPoints[i], offers, destinations), this.eventsListComponent.getElement());
     }
   }
 }
